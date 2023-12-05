@@ -1,4 +1,4 @@
-package com.example.mobile_npc_flutter
+package com.etdvlpr.npc_mobile_flutter
 
 import io.flutter.embedding.android.FlutterActivity
 
