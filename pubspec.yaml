@@ -1,0 +1,27 @@
+name: mobile_npc_flutter
+description: Cross-platform mobile app for browsing and displaying product information.
+
+# Specify the location to publish the package. 'none' means it won't be published to pub.dev.
+publish_to: 'none'
+
+# The version number of the Flutter project.
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.5 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Linting rules for maintaining code quality.
+  flutter_lints: ^2.0.0
+
+# Flutter specific configuration.
+flutter:
+  uses-material-design: true
