@@ -14,9 +14,19 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  
+
+  #For scanning QR code and barcode
+  mobile_scanner: ^3.5.5
+  image_picker: ^1.0.4
+
   #For accessing environment variables
   flutter_dotenv: ^5.1.0
+
+  #For parsing Gs1 barcodes
+  gs1_barcode_parser: ^1.0.5
+
+  #For formatting dates
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:
