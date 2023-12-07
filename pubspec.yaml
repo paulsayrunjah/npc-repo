@@ -15,12 +15,24 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
 
+  #for launching url
+  url_launcher: ^6.2.1
+
   #For scanning QR code and barcode
   mobile_scanner: ^3.5.5
   image_picker: ^1.0.4
 
   #For accessing environment variables
   flutter_dotenv: ^5.1.0
+
+  #For making api calls
+  akeneo_api_client: ^1.0.3
+
+  #For loading animation
+  flutter_spinkit: ^5.2.0
+
+  #For displaying images
+  cached_network_image: ^3.3.0
 
   #For parsing Gs1 barcodes
   gs1_barcode_parser: ^1.0.5
