@@ -29,11 +29,17 @@ The app integrates the following Flutter packages:
    cd npc-mobile-flutter
    flutter pub get
    ```
-3. Run the app.
+3. Create a `.env` file in the root directory, you can use the `.env.example` file as a template.
+   ```bash
+   AKENEO_API_BASE_URL=https://your-akeneo-instance.com
+   AKENEO_API_CLIENT_ID=your-client-id
+   AKENEO_API_CLIENT_SECRET=your-client-secret
+   ```
+4. Run the app.
    ```bash
    flutter run
    ```
-4. Enjoy!
+5. Enjoy!
 
 ## Contributing
 
