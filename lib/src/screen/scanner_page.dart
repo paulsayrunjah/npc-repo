@@ -169,15 +169,7 @@ class ScannerPageState extends State<ScannerPage> {
                             source: ImageSource.gallery,
                           );
                           if (image != null) {
-                            if (await controller.analyzeImage(image.path)) {
-                              if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Barcode found!'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                            } else {
+                            if (!await controller.analyzeImage(image.path)) {
                               if (!mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
