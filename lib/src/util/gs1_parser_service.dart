@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:gs1_barcode_parser/gs1_barcode_parser.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:npc_mobile_flutter/src/data/gs1_properties.dart';
@@ -16,7 +18,10 @@ class GS1ParserService {
     } else if (barcode.format == BarcodeFormat.dataMatrix &&
         barcode.rawValue != null) {
       final parser = GS1BarcodeParser.defaultParser();
-      final result = parser.parse(barcode.rawValue!);
+      final String code =
+          barcode.rawValue!.replaceAll(RegExp(r'(\(|\)|\s)'), '');
+      log('code: $code');
+      final result = parser.parse(code, codeType: CodeType.DATAMATRIX);
 
       return GS1Properties(
         GTIN: result.elements['01']?.data,

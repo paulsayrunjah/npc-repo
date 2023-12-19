@@ -24,13 +24,12 @@ class ProductDetails extends StatelessWidget {
     var authHeader = {'Authorization': apiClient.bearerToken};
     String imageLink = '';
 
-    if (product.values[imageAttribute]!.first.links?.download != null) {
+    if (product.values[imageAttribute]?.first.links?.download != null) {
       imageLink = product.values[imageAttribute]!.first.links!.download!.href;
-    } else {
+    } else if (product.values[imageAttribute]?.first.data != null) {
       imageLink =
           apiClient.getMediaFileUrl(product.values[imageAttribute]!.first.data);
     }
-
     return SingleChildScrollView(
       physics:
           const ClampingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
@@ -41,36 +40,38 @@ class ProductDetails extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            CachedNetworkImage(
-              imageUrl: imageLink,
-              httpHeaders: authHeader,
-              placeholder: (context, url) => const SpinKitChasingDots(
-                color: Colors.indigo,
+            Container(
+              constraints: const BoxConstraints(maxHeight: 400, minHeight: 300),
+              margin: const EdgeInsets.all(16),
+              child: CachedNetworkImage(
+                imageUrl: imageLink,
+                httpHeaders: authHeader,
+                placeholder: (context, url) => const SpinKitChasingDots(
+                  color: Colors.indigo,
+                ),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+                fit: BoxFit.contain,
               ),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-              // width: MediaQuery.of(context).size.height * 0.4,
-              height: MediaQuery.of(context).size.width,
-              fit: BoxFit.cover,
             ),
-            const Divider(color: Colors.black),
+            const Divider(color: Colors.black54),
             _buildInfoRow(
                 context, 'Country of Origin', getAttribute(countryAttribute)),
-            const Divider(color: Colors.black),
+            const Divider(color: Colors.black54),
             _buildInfoRow(context, 'Brand Name', getAttribute(brandAttribute)),
-            const Divider(color: Colors.black),
+            const Divider(color: Colors.black54),
             _buildInfoRow(
                 context, 'Functional Name', getAttribute(nameAttribute)),
-            const Divider(color: Colors.black),
+            const Divider(color: Colors.black54),
             _buildInfoRow(context, 'Manufacturer Name',
                 getAttribute(manufacturerAttribute)),
-            const Divider(color: Colors.black),
+            const Divider(color: Colors.black54),
             _buildInfoRow(context, 'Registration Number',
                 getAttribute(registrationAttribute)),
-            const Divider(color: Colors.black),
+            const Divider(color: Colors.black54),
             _buildInfoRow(context, 'Batch Number', getAttribute('batch')),
-            const Divider(color: Colors.black),
+            const Divider(color: Colors.black54),
             _buildInfoRow(context, 'Expiration Date', getAttribute('expiry')),
-            const Divider(color: Colors.black),
+            const Divider(color: Colors.black54),
             // Other content goes here
           ],
         ),
@@ -84,19 +85,17 @@ class ProductDetails extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       child: Row(
         children: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 0.4,
+          Expanded(
             child: Text(
               label,
               style: const TextStyle(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.normal,
                 color: Colors.indigo,
               ),
             ),
           ),
-          const Spacer(),
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 0.4,
+          const SizedBox(width: 8),
+          Expanded(
             child: value,
           ),
         ],
@@ -110,7 +109,7 @@ class ProductDetails extends StatelessWidget {
     }
     if (attribute == countryAttribute) {
       return Text(
-        product.values[attribute]!.first.data == null
+        product.values[attribute]?.first.data == null
             ? 'N/A'
             : countries[product.values[attribute]!.first.data] ?? 'N/A',
         style: const TextStyle(
@@ -140,7 +139,7 @@ class ProductDetails extends StatelessWidget {
               );
             }
             return Text(
-              product.values[attribute]!.first.data ?? 'N/A',
+              product.values[attribute]?.first.data ?? 'N/A',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,

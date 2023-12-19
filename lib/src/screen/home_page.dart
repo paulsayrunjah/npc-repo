@@ -27,6 +27,8 @@ class HomePageState extends State<HomePage> {
   Product? _product;
   GS1Properties? _properties;
   bool isLoading = false;
+  DateTime? currentBackPressTime;
+  bool canPop = false;
 
   @override
   void initState() {
@@ -35,41 +37,65 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: _product == null || _currentIndex == 1
-            ? null
-            : BackButton(
-                onPressed: () => setState(() {
-                  _product = null;
-                  _properties = null;
-                }),
-              ),
-        title: Text(_currentIndex == 1
-            ? 'About'
-            : _product == null
-                ? 'Scan Barcode'
-                : _properties?.GTIN ?? 'Scan Barcode'),
-      ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        child: getPage(_currentIndex),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onBottomNavItemTapped,
-        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
-        elevation: 0,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.camera),
-            label: 'Scan',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info),
-            label: 'About',
-          ),
-        ],
+    return WillPopScope(
+      onWillPop: () async {
+        final now = DateTime.now();
+        if (_product != null) {
+          setState(() => _product = _properties = null);
+          return false;
+        }
+        if (_currentIndex != 0) {
+          setState(() => _currentIndex = 0);
+          return false;
+        }
+        if (currentBackPressTime == null ||
+            now.difference(currentBackPressTime!) >
+                const Duration(seconds: 2)) {
+          currentBackPressTime = now;
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Press back again to exit'),
+            duration: Duration(seconds: 2),
+          ));
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: _product == null || _currentIndex == 1
+              ? null
+              : BackButton(
+                  onPressed: () => setState(() {
+                    _product = null;
+                    _properties = null;
+                  }),
+                ),
+          title: Text(_currentIndex == 1
+              ? 'About'
+              : _product == null
+                  ? 'Scan Barcode'
+                  : _properties?.GTIN ?? 'Scan Barcode'),
+        ),
+        body: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: getPage(_currentIndex),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: _onBottomNavItemTapped,
+          backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
+          elevation: 0,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.camera),
+              label: 'Scan',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.info),
+              label: 'About',
+            ),
+          ],
+        ),
       ),
     );
   }

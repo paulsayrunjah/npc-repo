@@ -115,12 +115,6 @@ class ScannerPageState extends State<ScannerPage> {
                             icon: ValueListenableBuilder(
                               valueListenable: controller.torchState,
                               builder: (context, state, child) {
-                                if (state == null) {
-                                  return const Icon(
-                                    Icons.flash_off,
-                                    color: Colors.grey,
-                                  );
-                                }
                                 switch (state) {
                                   case TorchState.off:
                                     return const Icon(
@@ -145,9 +139,6 @@ class ScannerPageState extends State<ScannerPage> {
                         icon: ValueListenableBuilder(
                           valueListenable: controller.cameraFacingState,
                           builder: (context, state, child) {
-                            if (state == null) {
-                              return const Icon(Icons.camera_front);
-                            }
                             switch (state) {
                               case CameraFacing.front:
                                 return const Icon(Icons.camera_front);
@@ -245,7 +236,6 @@ class BarcodeOverlay extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (barcode.corners == null) return;
     final adjustedSize = applyBoxFit(boxFit, arguments.size, size);
 
     double verticalPadding = size.height - adjustedSize.destination.height;
