@@ -98,6 +98,7 @@ class ScannerPageState extends State<ScannerPage> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
+                  margin: const EdgeInsets.only(bottom: 25),
                   alignment: Alignment.bottomCenter,
                   height: 100,
                   color: Colors.black.withOpacity(0.4),
