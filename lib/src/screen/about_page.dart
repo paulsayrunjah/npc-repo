@@ -11,6 +11,7 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? country = dotenv.env['COUNTRY'];
     return SingleChildScrollView(
       // Enable scrolling with a bouncing effect
       physics:
@@ -40,11 +41,41 @@ class AboutPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 // App description
-                const Text(
-                  'This app scans GS1 barcodes for health commodities and displays product information from the National Product Catalog.',
-                  style: TextStyle(fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
+                (country == null)
+                    ? const Text(
+                        'This app scans GS1 barcodes for health commodities and displays product information from the National Product Catalog.',
+                        style: TextStyle(fontSize: 16),
+                        textAlign: TextAlign.center,
+                      )
+                    : RichText(
+                        text: TextSpan(
+                          children: [
+                            const TextSpan(
+                              text:
+                                  'This app scans GS1 barcodes for health commodities and displays product information from the National Product Catalog of ',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                            ),
+                            TextSpan(
+                              text: country,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const TextSpan(
+                              text: '.',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                 const SizedBox(height: 12),
                 // Privacy policy and terms of use buttons
                 TextButton(
