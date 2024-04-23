@@ -5,7 +5,7 @@ description: Cross-platform mobile app for browsing and displaying product infor
 publish_to: 'none'
 
 # The version number of the Flutter project.
-version: 1.0.0+1
+version: 1.1.0+3
 
 environment:
   sdk: '>=3.1.0 <4.0.0'

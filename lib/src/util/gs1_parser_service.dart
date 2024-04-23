@@ -5,7 +5,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:npc_mobile_flutter/src/data/gs1_properties.dart';
 
 class GS1ParserService {
-  static const int minLength = 13;
+  static const int minLength = 12;
   static const int maxLength = 14;
 
   static GS1Properties? getGTIN(Barcode barcode) {
