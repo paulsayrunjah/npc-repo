@@ -17,7 +17,7 @@ class CustomLoader extends StatelessWidget {
   final double blur;
 
   const CustomLoader({
-    Key? key,
+    super.key,
     this.opacity = 0.1,
     this.color = Colors.indigo,
     this.progressIndicator = const SpinKitChasingDots(
@@ -27,7 +27,7 @@ class CustomLoader extends StatelessWidget {
     this.offset,
     this.dismissible = false,
     this.blur = 0.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,17 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// The AboutPage widget displays information about the National Product Catalog app.
 ///
-/// It includes a splash image, app version, a brief description of the app's purpose,
+/// It includes a splash image, app version, a brief description of the app's purpose
+/// customized based on the user's country (fetched from environment variables),
 /// and links to the privacy policy and terms of use.
-class AboutPage extends StatelessWidget {
+class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
 
   @override
+  State<AboutPage> createState() => _AboutPageState();
+}
+
+class _AboutPageState extends State<AboutPage> {
+  String? country;
+  PackageInfo _packageInfo = PackageInfo(
+    appName: '',
+    packageName: '',
+    version: '',
+    buildNumber: '',
+    buildSignature: '',
+    installerStore: '',
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    country = dotenv.env['COUNTRY'];
+    PackageInfo.fromPlatform()
+        .then((value) => setState(() => _packageInfo = value));
+  }
+
+  @override
   Widget build(BuildContext context) {
-    String? country = dotenv.env['COUNTRY'];
     return SingleChildScrollView(
       // Enable scrolling with a bouncing effect
       physics:
@@ -34,9 +58,9 @@ class AboutPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 64),
                 // App version
-                const Text(
-                  'National Product Catalog 1.0',
-                  style: TextStyle(fontSize: 24),
+                Text(
+                  'National Product Catalog ${_packageInfo.version}',
+                  style: const TextStyle(fontSize: 24),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
@@ -75,7 +99,9 @@ class AboutPage extends StatelessWidget {
                             ),
                           ],
                         ),
+                        textAlign: TextAlign.center,
                       ),
+
                 const SizedBox(height: 12),
                 // Privacy policy and terms of use buttons
                 TextButton(

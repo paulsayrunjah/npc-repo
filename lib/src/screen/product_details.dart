@@ -13,11 +13,11 @@ class ProductDetails extends StatelessWidget {
   final GS1Properties? gs1Properties;
 
   const ProductDetails({
-    Key? key,
+    super.key,
     required this.apiClient,
     required this.product,
     this.gs1Properties,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -4,6 +4,7 @@ import 'package:npc_mobile_flutter/src/screen/home_page.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
