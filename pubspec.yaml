@@ -57,7 +57,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.13.1 # dart run flutter_launcher_icons
 
   #For creating splash screen
-  flutter_native_splash: ^2.3.2 # dart run flutter_native_splash:create
+  #flutter_native_splash: ^2.3.2 # dart run flutter_native_splash:create
 
 # Flutter specific configuration.
 flutter:
