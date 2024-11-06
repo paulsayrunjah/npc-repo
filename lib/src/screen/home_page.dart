@@ -113,6 +113,8 @@ class HomePageState extends State<HomePage> {
   ///
   /// This method is called when the 'Start Scan' button is pressed.
   void _startScan(BuildContext context) async {
+    print("Okay ---> Here");
+
     Navigator.push<GS1Properties?>(
       context,
       MaterialPageRoute(
@@ -122,6 +124,7 @@ class HomePageState extends State<HomePage> {
       if (properties != null) {
         setState(() => isLoading = true);
         _properties = properties;
+        print(properties.GTIN);
         _getProduct(properties.GTIN).then(
           (value) => setState(() => isLoading = false),
           onError: (e) => setState(() => isLoading = false),
@@ -150,6 +153,7 @@ class HomePageState extends State<HomePage> {
     );
     return apiClient.getProducts(params: queryParameters).then(
       (searchResponse) {
+        print("Response ${searchResponse.embedded.items}");
         if (searchResponse.embedded.items.isNotEmpty == true) {
           setState(() {
             _product = Product.fromJson(searchResponse.embedded.items.first);
@@ -164,6 +168,7 @@ class HomePageState extends State<HomePage> {
         }
       },
       onError: (e, stackTrace) {
+        print('Error: ' + e.message);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString()),

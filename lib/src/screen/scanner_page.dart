@@ -27,26 +27,47 @@ class ScannerPageState extends State<ScannerPage> {
     if (barcode.barcodes.isEmpty) return;
     final detectedBarcode = barcode.barcodes.first;
     setState(() => this.barcode = detectedBarcode);
-    for (final barcode in barcode.barcodes) {
-      try {
-        final GS1Properties? properties = GS1ParserService.getGTIN(barcode);
-        controller.stop();
-        Navigator.pop(context, properties);
-      } catch (e) {
-        debugPrint(e.toString());
-        if (showingError == null ||
-            DateTime.now().difference(showingError!) >
-                const Duration(seconds: 2)) {
-          showingError = DateTime.now();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Invalid barcode!'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+
+    try {
+      final GS1Properties? properties =
+          GS1ParserService.getGTIN(barcode.barcodes.first);
+      controller.stop();
+      Navigator.pop(context, properties);
+    } catch (e) {
+      debugPrint(e.toString());
+      if (showingError == null ||
+          DateTime.now().difference(showingError!) >
+              const Duration(seconds: 2)) {
+        showingError = DateTime.now();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid barcode!'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
+
+    // for (final barcode in barcode.barcodes) {
+    //   try {
+    //     final GS1Properties? properties = GS1ParserService.getGTIN(barcode);
+    //     controller.stop();
+    //     Navigator.pop(context, properties);
+    //   } catch (e) {
+    //     debugPrint(e.toString());
+    //     if (showingError == null ||
+    //         DateTime.now().difference(showingError!) >
+    //             const Duration(seconds: 2)) {
+    //       showingError = DateTime.now();
+    //       ScaffoldMessenger.of(context).showSnackBar(
+    //         const SnackBar(
+    //           content: Text('Invalid barcode!'),
+    //           backgroundColor: Colors.red,
+    //         ),
+    //       );
+    //     }
+    //   }
+    // }
   }
 
   @override
