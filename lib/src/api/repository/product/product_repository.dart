@@ -11,7 +11,7 @@ class ProductRepository implements IProductRepository {
   // ProductRepository(this.apiService);
 
   @override
-  Future<DataState<ProductRegistrationResponse>> registerProduct(
+  Future<DataState<List<ProductRegistrationResponse>>> registerProduct(
       ProductRegistrationRequest request) async {
     try {
       final ApiService apiService = ApiService(dioConfig());

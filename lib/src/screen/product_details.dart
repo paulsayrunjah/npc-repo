@@ -1,7 +1,9 @@
 import 'package:akeneo_api_client/akeneo_api_client.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
+import 'package:npc_mobile_flutter/src/api/data_state.dart';
 import 'package:npc_mobile_flutter/src/api/repository/product/product_repository.dart';
 import 'package:npc_mobile_flutter/src/data/countries.dart';
 import 'package:npc_mobile_flutter/src/data/gs1_properties.dart';
@@ -31,6 +33,7 @@ class ProductDetails extends StatefulWidget {
 class _ProductDetailsState extends State<ProductDetails> {
   ActionType? selectedActionType = ActionType.release;
   var quantityController = TextEditingController();
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -104,18 +107,20 @@ class _ProductDetailsState extends State<ProductDetails> {
                       ),
                       SizedBox(
                         width: 200,
-                        child: ElevatedButton(
-                            onPressed: () async {
-                              if (quantityController.text.isEmpty) {
-                                return;
-                              }
+                        child: isLoading
+                            ? const Center(
+                                child: CircularProgressIndicator(),
+                              )
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  if (quantityController.text.isEmpty) {
+                                    return;
+                                  }
 
-                              var product = await createProduct();
-                              logApp(product.toJson());
-
-                              registerProduct(product);
-                            },
-                            child: const Text('Save')),
+                                  var product = await createProduct();
+                                  registerProduct(context, product);
+                                },
+                                child: const Text('Save')),
                       )
                     ],
                   ),
@@ -370,8 +375,35 @@ class _ProductDetailsState extends State<ProductDetails> {
     }
   }
 
-  registerProduct(ProductRegistrationRequest request) {
+  registerProduct(
+      BuildContext context, ProductRegistrationRequest request) async {
     final prodRepo = ProductRepository();
-    prodRepo.registerProduct(request);
+    setState(() {
+      isLoading = true;
+    });
+    final response = await prodRepo.registerProduct(request);
+    setState(() {
+      isLoading = false;
+    });
+
+    if (response is DataError) {
+      aweSomeDialog(
+          dialogType: DialogType.error,
+          context: context,
+          desc: response.error,
+          btnOkPress: () {});
+      return;
+    }
+
+    final data = response.data;
+    if (data != null) {
+      aweSomeDialog(
+          dialogType: DialogType.success,
+          context: context,
+          desc: data.first.message,
+          btnOkPress: () {
+            Navigator.pop(context);
+          });
+    }
   }
 }

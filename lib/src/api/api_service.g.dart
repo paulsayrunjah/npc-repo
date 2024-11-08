@@ -24,14 +24,14 @@ class _ApiService implements ApiService {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<ProductRegistrationResponse> registerProduct(
+  Future<List<ProductRegistrationResponse>> registerProduct(
       ProductRegistrationRequest request) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(request.toJson());
-    final _options = _setStreamType<ProductRegistrationResponse>(Options(
+    final _options = _setStreamType<List<ProductRegistrationResponse>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
@@ -47,10 +47,13 @@ class _ApiService implements ApiService {
           _dio.options.baseUrl,
           baseUrl,
         )));
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late ProductRegistrationResponse _value;
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<ProductRegistrationResponse> _value;
     try {
-      _value = ProductRegistrationResponse.fromJson(_result.data!);
+      _value = _result.data!
+          .map((dynamic i) =>
+              ProductRegistrationResponse.fromJson(i as Map<String, dynamic>))
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

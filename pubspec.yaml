@@ -45,6 +45,7 @@ dependencies:
   retrofit: ^4.4.1
   dio: ^5.7.0
   pretty_dio_logger: ^1.4.0
+  awesome_dialog: ^3.2.1
 
 dev_dependencies:
   flutter_test:

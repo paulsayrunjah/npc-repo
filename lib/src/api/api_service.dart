@@ -10,6 +10,6 @@ abstract class ApiService {
   factory ApiService(Dio dio, {String baseUrl}) = _ApiService;
 
   @POST("/gs1api/v1.0/scannedmetrics")
-  Future<ProductRegistrationResponse> registerProduct(
+  Future<List<ProductRegistrationResponse>> registerProduct(
       @Body() ProductRegistrationRequest request);
 }
