@@ -1,13 +1,18 @@
 import 'package:akeneo_api_client/akeneo_api_client.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
+import 'package:npc_mobile_flutter/src/api/repository/product/product_repository.dart';
 import 'package:npc_mobile_flutter/src/data/countries.dart';
 import 'package:npc_mobile_flutter/src/data/gs1_properties.dart';
+import 'package:npc_mobile_flutter/src/data/product_registration_request.dart';
 import 'package:npc_mobile_flutter/src/util/constants.dart';
+import 'package:npc_mobile_flutter/src/util/util.dart';
+import 'package:npc_mobile_flutter/src/widget/inputs/text_input.dart';
 
-class ProductDetails extends StatelessWidget {
+enum ActionType { dispatch, release }
+
+class ProductDetails extends StatefulWidget {
   final Product product;
   final AkeneoApiClient apiClient;
   final GS1Properties? gs1Properties;
@@ -20,16 +25,17 @@ class ProductDetails extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    var authHeader = {'Authorization': apiClient.bearerToken};
-    String imageLink = '';
+  State<ProductDetails> createState() => _ProductDetailsState();
+}
 
-    if (product.values[imageAttribute]?.first.links?.download != null) {
-      imageLink = product.values[imageAttribute]!.first.links!.download!.href;
-    } else if (product.values[imageAttribute]?.first.data != null) {
-      imageLink =
-          apiClient.getMediaFileUrl(product.values[imageAttribute]!.first.data);
-    }
+class _ProductDetailsState extends State<ProductDetails> {
+  ActionType? selectedActionType = ActionType.release;
+  var quantityController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.product.values[imageAttribute]?.first.links?.download != null) {
+    } else if (widget.product.values[imageAttribute]?.first.data != null) {}
     return SingleChildScrollView(
       physics:
           const ClampingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
@@ -40,19 +46,6 @@ class ProductDetails extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Container(
-              constraints: const BoxConstraints(maxHeight: 400, minHeight: 300),
-              margin: const EdgeInsets.all(16),
-              child: CachedNetworkImage(
-                imageUrl: imageLink,
-                httpHeaders: authHeader,
-                placeholder: (context, url) => const SpinKitChasingDots(
-                  color: Colors.indigo,
-                ),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-                fit: BoxFit.contain,
-              ),
-            ),
             const Divider(color: Colors.black54),
             _buildInfoRow(
                 context, 'Country of Origin', getAttribute(countryAttribute)),
@@ -72,11 +65,130 @@ class ProductDetails extends StatelessWidget {
             const Divider(color: Colors.black54),
             _buildInfoRow(context, 'Expiration Date', getAttribute('expiry')),
             const Divider(color: Colors.black54),
+
+            Container(
+              // height: 60,
+              margin: const EdgeInsets.only(top: 16),
+              padding: const EdgeInsets.only(left: 8, right: 8, bottom: 12),
+              child: Card(
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Register product',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      textFieldInput(
+                          hintText: 'Quantity',
+                          controller: quantityController,
+                          textInputAction: TextInputAction.done,
+                          keyboardType:
+                              const TextInputType.numberWithOptions()),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      actionTypeForm(context, selectedActionType,
+                          (ActionType? value) {
+                        setState(() {
+                          selectedActionType = value;
+                        });
+                      }),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      SizedBox(
+                        width: 200,
+                        child: ElevatedButton(
+                            onPressed: () async {
+                              if (quantityController.text.isEmpty) {
+                                return;
+                              }
+
+                              var product = await createProduct();
+                              logApp(product.toJson());
+
+                              registerProduct(product);
+                            },
+                            child: const Text('Save')),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            )
+
             // Other content goes here
           ],
         ),
       ),
     );
+  }
+
+  Widget actionTypeForm(
+    BuildContext context,
+    ActionType? groupValue,
+    ValueChanged<ActionType?> onChanged,
+  ) {
+    return SizedBox(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            title: const Text('Release'),
+            leading: Radio<ActionType>(
+              value: ActionType.release,
+              groupValue: groupValue,
+              onChanged: onChanged,
+            ),
+          ),
+          ListTile(
+            title: const Text('Dispatch'),
+            leading: Radio<ActionType>(
+              value: ActionType.dispatch,
+              groupValue: groupValue,
+              onChanged: onChanged,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<ProductRegistrationRequest> createProduct() async {
+    var countryOfOrigin = await getAttributeText(countryAttribute);
+    var brandName = await getAttributeText(brandAttribute);
+    var functionalName = await getAttributeText(nameAttribute);
+    var manufacturerName = await getAttributeText(manufacturerAttribute);
+    var registrationNumber = await getAttributeText(registrationAttribute);
+    var batchNumber = await getAttributeText('batch');
+    var expirationDate = await getAttributeText('expiry');
+
+    return ProductRegistrationRequest(
+      srcSystemCode: 'N/A',
+      registration: [
+        Registration(
+          countryOfOrigin: countryOfOrigin,
+          brandName: brandName,
+          functionalName: functionalName,
+          manufacturerName: manufacturerName,
+          registrationNumber: registrationNumber,
+          batchNumber: batchNumber,
+          expirationDate: convertDate(expirationDate),
+          quantity: int.tryParse(quantityController.text) ?? 0,
+          type: selectedActionType?.name ?? '',
+          source: "N/A",
+        )
+      ],
+    );
+
+    // You can now use `product` as needed.
   }
 
   Widget _buildInfoRow(BuildContext context, String label, Widget value) {
@@ -103,22 +215,69 @@ class ProductDetails extends StatelessWidget {
     );
   }
 
+  Future<String> getAttributeText(String attribute) async {
+    if (attribute == 'batch' || attribute == 'expiry') {
+      return _buildGs1InfoText(attribute);
+    }
+    if (attribute == countryAttribute) {
+      return widget.product.values[attribute]?.first.data == null
+          ? 'N/A'
+          : countries[widget.product.values[attribute]!.first.data] ?? 'N/A';
+    }
+    if (widget.product.values[attribute]?.first.data != null) {
+      String? value = await _getValueText(attribute);
+      return value ?? widget.product.values[attribute]?.first.data ?? 'N/A';
+    } else {
+      return 'N/A';
+    }
+  }
+
+  Future<String> _getValueText(String attributeCode) async {
+    var attribute = await widget.apiClient.getAttribute(attributeCode);
+    if ([AttributeType.simpleSelect.value, AttributeType.multiSelect.value]
+        .contains(attribute.type)) {
+      var value = await widget.apiClient.getAttributeOption(
+        attributeCode,
+        widget.product.values[attributeCode]!.first.data.toString(),
+      );
+      return value.labels[defaultLocale] ?? value.code;
+    }
+    return widget.product.values[attributeCode]!.first.data.toString();
+  }
+
+  String _buildGs1InfoText(String attribute) {
+    if (widget.gs1Properties == null) {
+      return 'N/A';
+    }
+    switch (attribute) {
+      case 'batch':
+        return widget.gs1Properties!.batchOrLotNumber ?? 'N/A';
+      case 'expiry':
+        return widget.gs1Properties!.expirationDate == null
+            ? 'N/A'
+            : DateFormat('dd/MM/yyyy')
+                .format(widget.gs1Properties!.expirationDate!);
+      default:
+        return 'N/A';
+    }
+  }
+
   Widget getAttribute(String attribute) {
     if (attribute == 'batch' || attribute == 'expiry') {
       return _buildGs1Info(attribute);
     }
     if (attribute == countryAttribute) {
       return Text(
-        product.values[attribute]?.first.data == null
+        widget.product.values[attribute]?.first.data == null
             ? 'N/A'
-            : countries[product.values[attribute]!.first.data] ?? 'N/A',
+            : countries[widget.product.values[attribute]!.first.data] ?? 'N/A',
         style: const TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.black,
         ),
       );
     }
-    if (product.values[attribute]?.first.data != null) {
+    if (widget.product.values[attribute]?.first.data != null) {
       return FutureBuilder(
           future: _getValue(attribute),
           builder: (context, AsyncSnapshot<String> snapshot) {
@@ -139,7 +298,7 @@ class ProductDetails extends StatelessWidget {
               );
             }
             return Text(
-              product.values[attribute]?.first.data ?? 'N/A',
+              widget.product.values[attribute]?.first.data ?? 'N/A',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -158,20 +317,20 @@ class ProductDetails extends StatelessWidget {
   }
 
   Future<String> _getValue(String attributeCode) async {
-    var attribute = await apiClient.getAttribute(attributeCode);
+    var attribute = await widget.apiClient.getAttribute(attributeCode);
     if ([AttributeType.simpleSelect.value, AttributeType.multiSelect.value]
         .contains(attribute.type)) {
-      var value = await apiClient.getAttributeOption(
+      var value = await widget.apiClient.getAttributeOption(
         attributeCode,
-        product.values[attributeCode]!.first.data.toString(),
+        widget.product.values[attributeCode]!.first.data.toString(),
       );
       return value.labels[defaultLocale] ?? value.code;
     }
-    return product.values[attributeCode]!.first.data.toString();
+    return widget.product.values[attributeCode]!.first.data.toString();
   }
 
   Widget _buildGs1Info(String attribute) {
-    if (gs1Properties == null) {
+    if (widget.gs1Properties == null) {
       return const Text(
         'N/A',
         style: TextStyle(
@@ -183,7 +342,7 @@ class ProductDetails extends StatelessWidget {
     switch (attribute) {
       case 'batch':
         return Text(
-          gs1Properties!.batchOrLotNumber ?? 'N/A',
+          widget.gs1Properties!.batchOrLotNumber ?? 'N/A',
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.black,
@@ -191,9 +350,10 @@ class ProductDetails extends StatelessWidget {
         );
       case 'expiry':
         return Text(
-          gs1Properties!.expirationDate == null
+          widget.gs1Properties!.expirationDate == null
               ? 'N/A'
-              : DateFormat('dd/MM/yyyy').format(gs1Properties!.expirationDate!),
+              : DateFormat('dd/MM/yyyy')
+                  .format(widget.gs1Properties!.expirationDate!),
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.black,
@@ -208,5 +368,10 @@ class ProductDetails extends StatelessWidget {
           ),
         );
     }
+  }
+
+  registerProduct(ProductRegistrationRequest request) {
+    final prodRepo = ProductRepository();
+    prodRepo.registerProduct(request);
   }
 }

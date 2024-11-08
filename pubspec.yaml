@@ -42,6 +42,9 @@ dependencies:
 
   #For getting the version of the app
   package_info_plus: ^8.0.0
+  retrofit: ^4.4.1
+  dio: ^5.7.0
+  pretty_dio_logger: ^1.4.0
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +58,10 @@ dev_dependencies:
 
   #For changing app icon
   flutter_launcher_icons: ^0.13.1 # dart run flutter_launcher_icons
+
+  build_runner:
+  json_serializable: ^6.6.1
+  retrofit_generator:
 
   #For creating splash screen
   #flutter_native_splash: ^2.3.2 # dart run flutter_native_splash:create

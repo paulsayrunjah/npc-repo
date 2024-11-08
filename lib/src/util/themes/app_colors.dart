@@ -1,0 +1,43 @@
+import 'package:flutter/material.dart';
+
+class AppColors {
+  static const primaryColorInt = 0xFF376298;
+  static const primaryColor = Color(0xFF376298);
+  static const primaryLightColor = Color(0xFF7ae150);
+  static const accentColor = Color(0xFFFDBF21);
+  static const appDarkTextThemeColor = Color(0XFF0B141E);
+  static const appLightTextThemeColor = Color(0XFF9a9a9a);
+  static const scaffoldBackgroundColor = Color(0XFFF9FAFB);
+  static const appTextLight = Color(0XFF475467);
+  static const indictorLight = Color(0XFFD7E0EA);
+  static const textInputBg = Color(0XFFF9FAFB);
+  static const dullPink = Color(0XFFFCEBE8);
+  static const lightBlue1 = Color(0XFFD7E0EA);
+  static const lightGray1 = Color(0XFFF5F7FA);
+  static const darkGray1 = Color(0XFF808896);
+  static const maroon = Color(0XFF783226);
+  static const lightMaroon = Color(0XFFFACCC3);
+  static const lightGreen = Color(0XFFEDFCF7);
+  static const green1 = Color(0XFF55EB76);
+  static const green2 = Color(0XFF278064);
+  static const green3 = Color(0XFF2F9977);
+  static const magenta = Color(0XFF1B314C);
+  static const purple1 = Color(0XFF8FB1EE);
+  static const orange1 = Color(0XFFFF6D00);
+  static const pink1 = Color(0XFFFC99C9);
+  static const pink2 = Color(0XFFFCE0DB);
+  static const skyBlue = Color(0XFFEDF4FC);
+  static const gray2 = Color(0XFFBCCBDD);
+  static const gray3 = Color(0XFF6B7280);
+  static const gray4 = Color(0XFFF9FAFB);
+  static const gray5 = Color(0XFFEDEDED);
+  static const yellow1 = Color(0XFFFEF8E0);
+  static const orange2 = Color(0XFFFB6542);
+  static const orange3 = Color(0XFFFFF4E5);
+  static const orangeColor = Color(0xFFF0654C);
+  static const orangeColorDull = Color(0xFFFCEBE8);
+  static const whiteColor = Color(0xFFFFFFFF);
+  static const redColor = Color(0xFFD92D20);
+  static const rocketRed = Color(0xFFF04B41);
+  static const skyPink = Color(0xFFE5CACD);
+}
