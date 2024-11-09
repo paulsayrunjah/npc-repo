@@ -8,6 +8,7 @@ import 'package:npc_mobile_flutter/src/api/repository/product/product_repository
 import 'package:npc_mobile_flutter/src/data/countries.dart';
 import 'package:npc_mobile_flutter/src/data/gs1_properties.dart';
 import 'package:npc_mobile_flutter/src/data/product_registration_request.dart';
+import 'package:npc_mobile_flutter/src/screen/home_page.dart';
 import 'package:npc_mobile_flutter/src/util/constants.dart';
 import 'package:npc_mobile_flutter/src/util/util.dart';
 import 'package:npc_mobile_flutter/src/widget/inputs/text_input.dart';
@@ -34,102 +35,143 @@ class _ProductDetailsState extends State<ProductDetails> {
   ActionType? selectedActionType = ActionType.release;
   var quantityController = TextEditingController();
   bool isLoading = false;
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     if (widget.product.values[imageAttribute]?.first.links?.download != null) {
     } else if (widget.product.values[imageAttribute]?.first.data != null) {}
-    return SingleChildScrollView(
-      physics:
-          const ClampingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: MediaQuery.of(context).size.height - 56 - 56 - 24,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const Divider(color: Colors.black54),
-            _buildInfoRow(
-                context, 'Country of Origin', getAttribute(countryAttribute)),
-            const Divider(color: Colors.black54),
-            _buildInfoRow(context, 'Brand Name', getAttribute(brandAttribute)),
-            const Divider(color: Colors.black54),
-            _buildInfoRow(
-                context, 'Functional Name', getAttribute(nameAttribute)),
-            const Divider(color: Colors.black54),
-            _buildInfoRow(context, 'Manufacturer Name',
-                getAttribute(manufacturerAttribute)),
-            const Divider(color: Colors.black54),
-            _buildInfoRow(context, 'Registration Number',
-                getAttribute(registrationAttribute)),
-            const Divider(color: Colors.black54),
-            _buildInfoRow(context, 'Batch Number', getAttribute('batch')),
-            const Divider(color: Colors.black54),
-            _buildInfoRow(context, 'Expiration Date', getAttribute('expiry')),
-            const Divider(color: Colors.black54),
-
-            Container(
-              // height: 60,
-              margin: const EdgeInsets.only(top: 16),
-              padding: const EdgeInsets.only(left: 8, right: 8, bottom: 12),
-              child: Card(
-                color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      const Text(
-                        'Register product',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                      textFieldInput(
-                          hintText: 'Quantity',
-                          controller: quantityController,
-                          textInputAction: TextInputAction.done,
-                          keyboardType:
-                              const TextInputType.numberWithOptions()),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      actionTypeForm(context, selectedActionType,
-                          (ActionType? value) {
-                        setState(() {
-                          selectedActionType = value;
-                        });
-                      }),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      SizedBox(
-                        width: 200,
-                        child: isLoading
-                            ? const Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            : ElevatedButton(
-                                onPressed: () async {
-                                  if (quantityController.text.isEmpty) {
-                                    return;
-                                  }
-
-                                  var product = await createProduct();
-                                  registerProduct(context, product);
-                                },
-                                child: const Text('Save')),
-                      )
-                    ],
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics()),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height - 56 - 56 - 24,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Card(
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Product details',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        _buildInfoRow(context, 'Country of Origin',
+                            getAttribute(countryAttribute)),
+                        const Divider(color: Colors.black54),
+                        _buildInfoRow(context, 'Brand Name',
+                            getAttribute(brandAttribute)),
+                        const Divider(color: Colors.black54),
+                        _buildInfoRow(context, 'Functional Name',
+                            getAttribute(nameAttribute)),
+                        const Divider(color: Colors.black54),
+                        _buildInfoRow(context, 'Manufacturer Name',
+                            getAttribute(manufacturerAttribute)),
+                        const Divider(color: Colors.black54),
+                        _buildInfoRow(context, 'Registration Number',
+                            getAttribute(registrationAttribute)),
+                        const Divider(color: Colors.black54),
+                        _buildInfoRow(
+                            context, 'Batch Number', getAttribute('batch')),
+                        const Divider(color: Colors.black54),
+                        _buildInfoRow(
+                            context, 'Expiration Date', getAttribute('expiry')),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            )
 
-            // Other content goes here
-          ],
+              Container(
+                // height: 60,
+                margin: const EdgeInsets.only(top: 16),
+                padding: const EdgeInsets.only(left: 4, right: 4, bottom: 8),
+                child: Card(
+                  color: Colors.white,
+                  child: Form(
+                    key: formKey,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          const Text(
+                            'Register product',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          textFieldInput(
+                              hintText: 'Quantity',
+                              validator: (final value) {
+                                if (value == null) {
+                                  return 'Quantity is required';
+                                }
+
+                                bool isNumeric = num.tryParse(value) != null;
+                                if (!isNumeric) {
+                                  return 'Quantity must be a number';
+                                }
+
+                                return null;
+                              },
+                              controller: quantityController,
+                              textInputAction: TextInputAction.done,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions()),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          actionTypeForm(context, selectedActionType,
+                              (ActionType? value) {
+                            setState(() {
+                              selectedActionType = value;
+                            });
+                          }),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          SizedBox(
+                            width: 200,
+                            child: isLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : ElevatedButton(
+                                    onPressed: () async {
+                                      if (formKey.currentState != null &&
+                                          !formKey.currentState!.validate()) {
+                                        return;
+                                      }
+
+                                      var product = await createProduct();
+                                      registerProduct(context, product);
+                                    },
+                                    child: const Text('Save')),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              )
+
+              // Other content goes here
+            ],
+          ),
         ),
       ),
     );
@@ -140,29 +182,27 @@ class _ProductDetailsState extends State<ProductDetails> {
     ActionType? groupValue,
     ValueChanged<ActionType?> onChanged,
   ) {
-    return SizedBox(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListTile(
-            title: const Text('Release'),
-            leading: Radio<ActionType>(
-              value: ActionType.release,
-              groupValue: groupValue,
-              onChanged: onChanged,
-            ),
-          ),
-          ListTile(
-            title: const Text('Dispatch'),
-            leading: Radio<ActionType>(
-              value: ActionType.dispatch,
-              groupValue: groupValue,
-              onChanged: onChanged,
-            ),
-          ),
-        ],
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RadioListTile<ActionType>(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Release'),
+          value: ActionType.release,
+          groupValue: groupValue,
+          onChanged: onChanged,
+        ),
+        RadioListTile<ActionType>(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Dispatch'),
+          value: ActionType.dispatch,
+          groupValue: groupValue,
+          onChanged: onChanged,
+        ),
+      ],
     );
   }
 
@@ -202,19 +242,15 @@ class _ProductDetailsState extends State<ProductDetails> {
       padding: const EdgeInsets.all(8),
       child: Row(
         children: [
-          Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.normal,
-                color: Colors.indigo,
-              ),
+          Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.normal,
+              color: Colors.indigo,
             ),
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: value,
-          ),
+          const Spacer(),
+          value,
         ],
       ),
     );
@@ -402,7 +438,12 @@ class _ProductDetailsState extends State<ProductDetails> {
           context: context,
           desc: data.first.message,
           btnOkPress: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomePage(),
+              ),
+            );
           });
     }
   }
