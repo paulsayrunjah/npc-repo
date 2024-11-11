@@ -9,11 +9,11 @@ import 'package:npc_mobile_flutter/src/data/countries.dart';
 import 'package:npc_mobile_flutter/src/data/gs1_properties.dart';
 import 'package:npc_mobile_flutter/src/data/product_registration_request.dart';
 import 'package:npc_mobile_flutter/src/screen/home_page.dart';
+import 'package:npc_mobile_flutter/src/screen/register_product_form.dart';
 import 'package:npc_mobile_flutter/src/util/constants.dart';
 import 'package:npc_mobile_flutter/src/util/util.dart';
-import 'package:npc_mobile_flutter/src/widget/inputs/text_input.dart';
 
-enum ActionType { dispatch, release }
+enum ActionType { commission, receipt, dispatch, decommission }
 
 class ProductDetails extends StatefulWidget {
   final Product product;
@@ -32,10 +32,7 @@ class ProductDetails extends StatefulWidget {
 }
 
 class _ProductDetailsState extends State<ProductDetails> {
-  ActionType? selectedActionType = ActionType.release;
-  var quantityController = TextEditingController();
   bool isLoading = false;
-  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -93,83 +90,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                   ),
                 ),
               ),
-
-              Container(
-                // height: 60,
-                margin: const EdgeInsets.only(top: 16),
-                padding: const EdgeInsets.only(left: 4, right: 4, bottom: 8),
-                child: Card(
-                  color: Colors.white,
-                  child: Form(
-                    key: formKey,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          const Text(
-                            'Register product',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          textFieldInput(
-                              hintText: 'Quantity',
-                              validator: (final value) {
-                                if (value == null) {
-                                  return 'Quantity is required';
-                                }
-
-                                bool isNumeric = num.tryParse(value) != null;
-                                if (!isNumeric) {
-                                  return 'Quantity must be a number';
-                                }
-
-                                return null;
-                              },
-                              controller: quantityController,
-                              textInputAction: TextInputAction.done,
-                              keyboardType:
-                                  const TextInputType.numberWithOptions()),
-                          const SizedBox(
-                            height: 4,
-                          ),
-                          actionTypeForm(context, selectedActionType,
-                              (ActionType? value) {
-                            setState(() {
-                              selectedActionType = value;
-                            });
-                          }),
-                          const SizedBox(
-                            height: 4,
-                          ),
-                          SizedBox(
-                            width: 200,
-                            child: isLoading
-                                ? const Center(
-                                    child: CircularProgressIndicator(),
-                                  )
-                                : ElevatedButton(
-                                    onPressed: () async {
-                                      if (formKey.currentState != null &&
-                                          !formKey.currentState!.validate()) {
-                                        return;
-                                      }
-
-                                      var product = await createProduct();
-                                      registerProduct(context, product);
-                                    },
-                                    child: const Text('Save')),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              )
-
-              // Other content goes here
+              RegisterProductForm(onRegisterClick: (requestData) async {
+                var product = await createProduct(requestData);
+                registerProduct(context, product);
+              })
             ],
           ),
         ),
@@ -177,36 +101,8 @@ class _ProductDetailsState extends State<ProductDetails> {
     );
   }
 
-  Widget actionTypeForm(
-    BuildContext context,
-    ActionType? groupValue,
-    ValueChanged<ActionType?> onChanged,
-  ) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        RadioListTile<ActionType>(
-          dense: true,
-          contentPadding: EdgeInsets.zero,
-          title: const Text('Release'),
-          value: ActionType.release,
-          groupValue: groupValue,
-          onChanged: onChanged,
-        ),
-        RadioListTile<ActionType>(
-          dense: true,
-          contentPadding: EdgeInsets.zero,
-          title: const Text('Dispatch'),
-          value: ActionType.dispatch,
-          groupValue: groupValue,
-          onChanged: onChanged,
-        ),
-      ],
-    );
-  }
-
-  Future<ProductRegistrationRequest> createProduct() async {
+  Future<ProductRegistrationRequest> createProduct(
+      RequestData requestData) async {
     var countryOfOrigin = await getAttributeText(countryAttribute);
     var brandName = await getAttributeText(brandAttribute);
     var functionalName = await getAttributeText(nameAttribute);
@@ -226,9 +122,9 @@ class _ProductDetailsState extends State<ProductDetails> {
           registrationNumber: registrationNumber,
           batchNumber: batchNumber,
           expirationDate: convertDate(expirationDate),
-          quantity: int.tryParse(quantityController.text) ?? 0,
-          type: selectedActionType?.name ?? '',
-          source: "N/A",
+          quantity: requestData.quantity,
+          type: requestData.type,
+          source: requestData.source,
         )
       ],
     );
