@@ -38,7 +38,7 @@ class Registration {
   String expirationDate;
   int quantity;
   String type;
-  String source;
+  String location;
 
   Registration({
     required this.countryOfOrigin,
@@ -50,7 +50,7 @@ class Registration {
     required this.expirationDate,
     required this.quantity,
     required this.type,
-    required this.source,
+    required this.location,
   });
 
   factory Registration.fromJson(Map<String, dynamic> json) => Registration(
@@ -63,7 +63,7 @@ class Registration {
         expirationDate: json["expiration_date"],
         quantity: json["quantity"],
         type: json["type"],
-        source: json["source"],
+        location: json["location"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -76,6 +76,6 @@ class Registration {
         "expiration_date": expirationDate,
         "quantity": quantity,
         "type": type,
-        "source": source,
+        "location": location,
       };
 }

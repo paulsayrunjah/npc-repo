@@ -90,10 +90,18 @@ class _ProductDetailsState extends State<ProductDetails> {
                   ),
                 ),
               ),
-              RegisterProductForm(onRegisterClick: (requestData) async {
-                var product = await createProduct(requestData);
-                registerProduct(context, product);
-              })
+              RegisterProductForm(
+                  isLoading: isLoading,
+                  onRegisterClick: (requestData) async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    var product = await createProduct(requestData);
+                    await registerProduct(context, product);
+                    setState(() {
+                      isLoading = false;
+                    });
+                  })
             ],
           ),
         ),
@@ -124,12 +132,10 @@ class _ProductDetailsState extends State<ProductDetails> {
           expirationDate: convertDate(expirationDate),
           quantity: requestData.quantity,
           type: requestData.type,
-          source: requestData.source,
+          location: requestData.location,
         )
       ],
     );
-
-    // You can now use `product` as needed.
   }
 
   Widget _buildInfoRow(BuildContext context, String label, Widget value) {
@@ -307,7 +313,7 @@ class _ProductDetailsState extends State<ProductDetails> {
     }
   }
 
-  registerProduct(
+  Future registerProduct(
       BuildContext context, ProductRegistrationRequest request) async {
     final prodRepo = ProductRepository();
     setState(() {

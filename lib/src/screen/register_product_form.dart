@@ -8,17 +8,19 @@ import 'package:npc_mobile_flutter/src/widget/inputs/text_input.dart';
 
 class RequestData {
   int quantity;
-  String source;
+  String location;
   String type;
 
   RequestData(
-      {required this.quantity, required this.source, required this.type});
+      {required this.quantity, required this.location, required this.type});
 }
 
 // ignore: must_be_immutable
 class RegisterProductForm extends StatefulWidget {
   Function(RequestData) onRegisterClick;
-  RegisterProductForm({super.key, required this.onRegisterClick});
+  bool isLoading;
+  RegisterProductForm(
+      {super.key, required this.onRegisterClick, required this.isLoading});
 
   @override
   State<RegisterProductForm> createState() => _RegisterProductFormState();
@@ -27,14 +29,13 @@ class RegisterProductForm extends StatefulWidget {
 class _RegisterProductFormState extends State<RegisterProductForm> {
   ActionType? selectedActionType;
   var quantityController = TextEditingController();
-  bool isLoading = false;
   final formKey = GlobalKey<FormState>();
-  final defaultSource = "Select location";
+  final defaultLocation = "Select location";
   final sourceItems = ["Select location", "NDA", "NMS", "JMS", "Facility"]
       .map((item) => DropDownItem(text: item, value: item))
       .toList();
 
-  String selectedSource = "Select location";
+  String selectedLocation = "Select location";
   List<ActionType> actionTypes = ActionType.values;
 
   final locationAndTypes = {
@@ -43,6 +44,11 @@ class _RegisterProductFormState extends State<RegisterProductForm> {
     "JMS": [ActionType.receipt, ActionType.dispatch],
     "Facility": [ActionType.receipt, ActionType.decommission],
   };
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,14 +94,14 @@ class _RegisterProductFormState extends State<RegisterProductForm> {
                 dropDown(
                     context: context,
                     list: sourceItems,
-                    defaultValue: defaultSource,
-                    selectedValue: selectedSource,
+                    defaultValue: defaultLocation,
+                    selectedValue: selectedLocation,
                     onChanged: (final newValue) {
                       FocusScope.of(context).requestFocus(FocusNode());
                       setState(() {
-                        selectedSource = newValue;
-                        if (selectedSource != defaultSource) {
-                          actionTypes = locationAndTypes[selectedSource]!;
+                        selectedLocation = newValue;
+                        if (selectedLocation != defaultLocation) {
+                          actionTypes = locationAndTypes[selectedLocation]!;
                         }
                       });
                     }),
@@ -113,7 +119,7 @@ class _RegisterProductFormState extends State<RegisterProductForm> {
                 ),
                 SizedBox(
                   width: 200,
-                  child: isLoading
+                  child: widget.isLoading
                       ? const Center(
                           child: CircularProgressIndicator(),
                         )
@@ -124,11 +130,11 @@ class _RegisterProductFormState extends State<RegisterProductForm> {
                               return;
                             }
 
-                            if (selectedSource == defaultSource) {
+                            if (selectedLocation == defaultLocation) {
                               aweSomeDialog(
                                   dialogType: DialogType.error,
                                   context: context,
-                                  desc: 'Please provide a location',
+                                  desc: 'Please select a location',
                                   btnOkPress: () {});
                               return;
                             }
@@ -137,7 +143,7 @@ class _RegisterProductFormState extends State<RegisterProductForm> {
                               aweSomeDialog(
                                   dialogType: DialogType.error,
                                   context: context,
-                                  desc: 'Please provide a type',
+                                  desc: 'Please select a type',
                                   btnOkPress: () {});
                               return;
                             }
@@ -145,7 +151,7 @@ class _RegisterProductFormState extends State<RegisterProductForm> {
                             RequestData requestData = RequestData(
                                 quantity:
                                     int.tryParse(quantityController.text) ?? 0,
-                                source: selectedSource,
+                                location: selectedLocation,
                                 type: selectedActionType?.name ?? 'N/A');
                             widget.onRegisterClick(requestData);
                           },
@@ -165,7 +171,7 @@ class _RegisterProductFormState extends State<RegisterProductForm> {
     ValueChanged<ActionType?> onChanged,
   ) {
     return Visibility(
-      visible: selectedSource != defaultSource,
+      visible: selectedLocation != defaultLocation,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
