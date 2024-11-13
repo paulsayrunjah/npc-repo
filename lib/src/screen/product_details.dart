@@ -74,7 +74,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                         _buildInfoRow(context, 'Functional Name',
                             getAttribute(nameAttribute)),
                         const Divider(color: Colors.black54),
-                        _buildInfoRow(context, 'Manufacturer Name',
+                        _buildInfoRow(context, 'Manufacturer Code',
                             getAttribute(manufacturerAttribute)),
                         const Divider(color: Colors.black54),
                         _buildInfoRow(context, 'Manufacturer Address',
