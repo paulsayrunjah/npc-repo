@@ -216,6 +216,21 @@ class _ProductDetailsState extends State<ProductDetails> {
     if (attribute == 'batch' || attribute == 'expiry') {
       return _buildGs1Info(attribute);
     }
+
+    if (attribute == manufacturerAttribute) {
+      final data =
+          widget.product.values[attribute]?.first.data.toString() ?? 'N/A';
+      return Text(
+        data,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+        maxLines: null,
+        overflow: TextOverflow.visible,
+        softWrap: true,
+      );
+    }
     if (attribute == countryAttribute) {
       return Text(
         widget.product.values[attribute]?.first.data == null
