@@ -144,15 +144,19 @@ class _ProductDetailsState extends State<ProductDetails> {
       padding: const EdgeInsets.all(8),
       child: Row(
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.normal,
-              color: Colors.indigo,
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontWeight: FontWeight.normal,
+                color: Colors.indigo,
+              ),
             ),
           ),
           const Spacer(),
-          value,
+          Expanded(
+            child: value,
+          )
         ],
       ),
     );
@@ -218,6 +222,9 @@ class _ProductDetailsState extends State<ProductDetails> {
           fontWeight: FontWeight.bold,
           color: Colors.black,
         ),
+        maxLines: null,
+        overflow: TextOverflow.visible,
+        softWrap: true,
       );
     }
     if (widget.product.values[attribute]?.first.data != null) {
@@ -238,6 +245,9 @@ class _ProductDetailsState extends State<ProductDetails> {
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
+                maxLines: null,
+                overflow: TextOverflow.visible,
+                softWrap: true,
               );
             }
             return Text(
@@ -246,6 +256,9 @@ class _ProductDetailsState extends State<ProductDetails> {
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
+              maxLines: null,
+              overflow: TextOverflow.visible,
+              softWrap: true,
             );
           });
     } else {
